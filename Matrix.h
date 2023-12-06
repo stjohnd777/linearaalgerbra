@@ -185,6 +185,16 @@ public:
         return x;
     }
 
+    /*
+     * If A is a square matrix, then the minor Mij column is
+     * a number formed taking the determinate of  matrix by deleting
+     * the i row and j column of A and is denoted Mij
+     *
+     * The cofactor Cij  is obtained by multiplying the
+     * minor Cij =(-1)^(i+j) * Mij
+     *
+     * The Cofactor Matrix C = [ Cij]
+     */
     Matrix<T,ROWS-1,ROWS-1> getMinor(size_t r, size_t  c){
         std::array<T,(ROWS-1)*(ROWS-1)> aij;
         size_t index = 0;
@@ -214,29 +224,6 @@ public:
         return cof;
     }
 
-
-//    T determinate ( ){
-//        assert( ROWS == COLS);
-//        T det = 0;
-//        if ( ROWS == 2){
-//            det = getElement(0, 0) * getElement(1, 1) - getElement(0, 1) * getElement(1, 0);
-//        } else if ( ROWS ==3){
-//            det =     getElement(0, 0) * getElement(1, 1) * getElement(2, 2 ) // aei
-//                      +   getElement(0, 1) * getElement(1, 2) * getElement(2, 0 ) // bfg
-//                      +   getElement(0, 2) * getElement(1, 0) * getElement(2, 1 ) // cdh
-//                      -   getElement(0, 2) * getElement(1, 1) * getElement(2, 0 )  // ceg
-//                      -   getElement(0, 1) * getElement(1, 0) * getElement(2, 2 )  // bdi
-//                      -   getElement(0, 0) * getElement(1, 2) * getElement(2, 1 );  // bdi
-//        } else {
-//            T det = 0;
-//            for ( auto col =0; col < ROWS; col++){
-//                Matrix<T,ROWS-1,COLS-1>  m0C = getMinor(0,col);
-//                m0C.determinate();
-//                det += pow(-1,col);//*  getMinor(0,col).determinate();
-//            }
-//        }
-//        return det;
-//    }
 
     Matrix<T,ROWS,ROWS> inv (){
         assert(ROWS==COLS);
@@ -292,45 +279,53 @@ private:
 
 };
 
-//
-//template <typename T>
-//T determinate2x2 (const  Matrix<T,2,2>& m){
-//    T v = m.getElement(0, 0) * m.getElement(1, 1) - m.getElement(0, 1) * m.getElement(1, 0);
-//    return v;
-//}
-//
-//template <typename T>
-//T determinate3x3 (const  Matrix<T,3,3>& m){
-//    T v =     m.getElement(0, 0) * m.getElement(1, 1) * m.getElement(2, 2 ) // aei
-//          +   m.getElement(0, 1) * m.getElement(1, 2) * m.getElement(2, 0 ) // bfg
-//          +   m.getElement(0, 2) * m.getElement(1, 0) * m.getElement(2, 1 ) // cdh
-//          -   m.getElement(0, 2) * m.getElement(1, 1) * m.getElement(2, 0 )  // ceg
-//          -   m.getElement(0, 1) * m.getElement(1, 0) * m.getElement(2, 2 )  // bdi
-//          -   m.getElement(0, 0) * m.getElement(1, 2) * m.getElement(2, 1 );  // bdi
-//
-//    return v;
-//}
-//
+class DCM : public Matrix<double,3,3> {
+public:
+    DCM (){
+
+    }
+    DCM (double roll, double pitch, double yaw){
+
+    }
+};
+
+class Quaternion {
+public:
+};
+
 template<typename T, size_t N>
 T determinate (  Matrix<T,N,N>& m){
     T det = 0;
     if ( N == 2){
         det = m.getElement(0, 0) * m.getElement(1, 1) - m.getElement(0, 1) * m.getElement(1, 0);
     } else if ( N ==3){
-       det =     m.getElement(0, 0) * m.getElement(1, 1) * m.getElement(2, 2 ) // aei
-                  +   m.getElement(0, 1) * m.getElement(1, 2) * m.getElement(2, 0 ) // bfg
-                  +   m.getElement(0, 2) * m.getElement(1, 0) * m.getElement(2, 1 ) // cdh
-                  -   m.getElement(0, 2) * m.getElement(1, 1) * m.getElement(2, 0 )  // ceg
-                  -   m.getElement(0, 1) * m.getElement(1, 0) * m.getElement(2, 2 )  // bdi
-                  -   m.getElement(0, 0) * m.getElement(1, 2) * m.getElement(2, 1 );  // bdi
+        /*
+           a b c
+           d e f
+           g h i
+         */
+        auto a = m.getElement(0,0);
+        auto b = m.getElement(0,1);
+        auto c = m.getElement(0,2);
+
+        auto d = m.getElement(1,0);
+        auto e = m.getElement(1,1);
+        auto f = m.getElement(1,2);
+
+        auto g = m.getElement(2,0);
+        auto h = m.getElement(2,1);
+        auto i = m.getElement(0,0);
+       det =   a*e*i + b*f*g +c*d*h -  c*e*g -  b*d*i - b*d*i;
     } else {
-        T det = 0;
-//        for ( auto col =0; col < N; col++){
-//            Matrix<T,N-1,N-1> c = m.getMinor(0,col);
-//            T v = determinate<T,N-1>(c);
-//            det += pow(-1,col)*v;
-//            // det += pow(-1,col)*  determinateN<T,N-1> (m.getMinor(0,col));
-//        }
+
+        for ( auto col =0; col < N; col++){
+            Matrix<T,N-1,N-1> c = m.getMinor(0,col);
+            cout << c << endl;
+            T detc = determinate(c);
+
+//            T v = m.getElement(0,col)*determinate<T,N-1>(c);
+//            det += pow(-1,col)* v;
+        }
     }
     return det;
 }
@@ -355,3 +350,9 @@ Matrix<T,ROWS,COLS> CreateOnes(){
     }
     return I;
 }
+
+template< typename T =double, size_t ROWS , size_t K>
+void Convolution(Matrix<T,ROWS,ROWS>& img, Matrix<T,K,K>& ker ) {
+
+}
+

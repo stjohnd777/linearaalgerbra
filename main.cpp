@@ -12,21 +12,7 @@ using namespace std;
 
 int main() {
 
-    /**
-     * Test initializer_list
-     */
-    Matrix<double, 3, 3> aM1{11, 12, 13, 21, 22, 23, 31, 32, 33};
-    cout << aM1 << endl;
-    cout << determinate(aM1) << endl;
 
-    std::array<RowVector<double, 3>, 3> ii = {
-            RowVector<double, 3>{1, 0, 0},
-            RowVector<double, 3>{0, 1, 0},
-            RowVector<double, 3>{0, 0, 1} };
-
-    Matrix<double, 3, 3> II(ii);
-
-    cout << determinate(II) << endl;
 
 
 //    auto r1 = aM1.getRow(0);
