@@ -8,17 +8,16 @@ using namespace std;
 #include "ColVector.h"
 #include "RowVector.h"
 #include "Matrix.h"
+#include "Determinate.h"
+#include "Utils.h"
 
 
 int main() {
 
 
-
-
-//    auto r1 = aM1.getRow(0);
-//    if ( r1 == { 11,12,13 } ){
-//        cout << "good" << endl;
-//    }
+    Matrix<double, 3, 3> aM1{11, 12, 13, 21, 22, 23, 31, 32, 33};
+    cout << aM1 << endl;
+    cout << determinate(aM1) << endl;
 
     /**
      * Test row iterator
@@ -29,9 +28,12 @@ int main() {
     /**
      * Test col iterator
      */
-    for (auto col: aM1.getCols()) {
+    for (auto col: aM1.getColVectors()) {
         cout << col << endl;
     }
+
+    cout << "transpose" << endl;
+    cout << aM1.transpose()<< endl;
 
     // row * col test
     RowVector<double, 3> row = {1, 2, 3};
@@ -60,12 +62,12 @@ int main() {
     cout << z << endl;
     cout << endl;
 
-    cout << z.getRow(0) << endl;
-    cout << z.getRow(1) << endl;
-    cout << z.getRow(2) << endl;
-    cout << z.getCol(0) << endl;
-    cout << z.getCol(1) << endl;
-    cout << z.getCol(2) << endl;
+    cout << z.getRowVector(0) << endl;
+    cout << z.getRowVector(1) << endl;
+    cout << z.getRowVector(2) << endl;
+    cout << z.getColVector(0) << endl;
+    cout << z.getColVector(1) << endl;
+    cout << z.getColVector(2) << endl;
 
     // constructor I
     std::array<RowVector<double, 3>, 3> i = {
@@ -116,11 +118,11 @@ int main() {
     /**
      * Test matrix scalar multiplication
      */
-    auto c = CreateIdentity<int, 10, 10>();
+    auto c = utils::CreateIdentity<int, 10, 10>();
     cout << c << endl;
     auto I10 = 10 * c;
     cout << I10 << endl;
-    auto cc = CreateOnes<int, 10, 10>();
+    auto cc = utils::CreateOnes<int, 10, 10>();
     cout << cc << endl;
     cout << 10 * cc << endl;
     cout << cc * 10 << endl;
@@ -160,14 +162,14 @@ int main() {
     cout << T << endl;
 
     cout << T.getMinor(0, 0) << endl;
-    for (auto r = 0; r < T.rows; r++) {
-        for (auto c = 0; c < T.cols; c++) {
+    for (auto r = 0; r < T.m_rows; r++) {
+        for (auto c = 0; c < T.m_cols; c++) {
 
             cout << "C(" << r +1 << "," << c + 1 << ")" << endl;
             cout << T << endl;
             auto minor = T.getMinor(r, c);
             cout << minor << endl;
-//            cout << minor.determinate() << endl;
+            cout <<  determinate(minor) << endl;
         }
     }
 

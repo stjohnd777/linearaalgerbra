@@ -1,6 +1,7 @@
-#include <iostream>
 #include <gtest/gtest.h>
+#include <iostream>
 #include "Matrix.h"
+#include "Determinate.h"
 
 using namespace std;
 
@@ -22,11 +23,11 @@ TEST(Matrix, initializer_list) {
 }
 
 TEST(Matrix, array_RowVector) {
-
-    std::array<RowVector<double, 3>, 3> rows = {
-            RowVector<double, 3>{11, 12, 13},
-            RowVector<double, 3>{21, 22, 23},
-            RowVector<double, 3>{31, 32, 33} };
+    const std::array<RowVector<double, 3>, 3> rows = {
+            RowVector<double, 3>{11.0, 12.0, 13.0},
+            RowVector<double, 3>{21.0, 22.0, 23.0},
+            RowVector<double, 3>{31.0, 32.0, 33.0}
+    };
     Matrix<double, 3, 3> m(rows);
     cout << m << endl;
 
@@ -42,11 +43,9 @@ TEST(Matrix, array_RowVector) {
 }
 
 TEST(Matrix, det3x3) {
-
-    Matrix<double, 3, 3> m{11, 12, 13, 21, 22, 23, 31, 32, 33};
+    const Matrix<double, 3, 3> m{11, 12, 13, 21, 22, 23, 31, 32, 33};
     cout << m << endl;
-    //cout << determinate(m) << endl;
-    //EXPECT_EQ(determinate(m), 11);
+
 
     Matrix<double, 3, 3> i3{1, 0, 0,
                            0, 1, 0,
@@ -85,7 +84,7 @@ TEST(Matrix, iterator) {
     /**
      * Test col iterator
      */
-    for (auto col: aM1.getCols()) {
+    for (auto col: aM1.getColVectors()) {
         cout << col << endl;
     }
 }

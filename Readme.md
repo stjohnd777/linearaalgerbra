@@ -1,0 +1,7 @@
+- Using std::array for both RowVector and the internal 
+- representation of Matrix is a good choice as it ensures compile-time 
+- fixed sizing and contiguous memory.
+- modularity
+  - row vector
+  - column vector
+  - matrix as composite or col or row vectors

@@ -1,10 +1,23 @@
 cmake_minimum_required(VERSION 3.25)
-project(linearalgerba)
+project(linear_algebra)
 
 set(CMAKE_CXX_STANDARD 20)
 
-include(FetchContent)
 
+# Recursively collect all header files in the 'header/' directory
+set(HEADER_DIRECTORY "${CMAKE_SOURCE_DIR}/include")
+file(GLOB_RECURSE HEADER_FILES
+        "${HEADER_DIRECTORY}/*.h"
+        "${HEADER_DIRECTORY}/*.hpp"
+)
+# Recursively collect all cpp files in the 'header/' directory
+set(SOURCE_DIRECTORY "${CMAKE_SOURCE_DIR}/src" )
+file(GLOB_RECURSE SOURCE_FILES
+        "${SOURCE_DIRECTORY}/*.c"
+        "${SOURCE_DIRECTORY}/*.cpp"
+)
+
+include(FetchContent)
 find_package(Eigen3 REQUIRED)
 if(Eigen3_FOUND)
     link_directories(${Eigen_INCLUDE_DIRS})
@@ -22,6 +35,7 @@ else()
     FetchContent_MakeAvailable(Eigen)
 endif()
 
+
 find_package(GTest REQUIRED)
 if(GTest_FOUND)
     message(STATUS "Found GTest Success!" ${GTest_LIBS})
@@ -36,24 +50,39 @@ else ()
 endif()
 
 
-add_executable(linearalgerba
-        main.cpp
-        RowVector.h
-        ColVector.h
-        Matrix.h )
+add_library(linear_algebra
+        ${HEADER_FILES}
+        ${SOURCE_FILES}
+        include/Vector.h
+)
 
-target_link_libraries(linearalgerba  PRIVATE  Eigen3::Eigen)
+# Add the include directory for headers to the linear_algebra library
+target_include_directories(linear_algebra
+        PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+)
+
+add_executable(linear_algebra_main main/main.cpp )
+target_link_libraries(linear_algebra_main PUBLIC linear_algebra)
 
 
 enable_testing()
-
+set(TEST_DIRECTORY "${CMAKE_SOURCE_DIR}/test" )
+file(GLOB_RECURSE TEST_FILES
+#        "${TEST_DIRECTORY}/*.h"
+        "${TEST_DIRECTORY}/*.cc"
+)
 add_executable(
         tests
-        test.cc
+        ${TEST_FILES}
 )
+
 target_link_libraries(
         tests
         GTest::gtest_main
+        linear_algebra
+        Eigen3::Eigen
 )
 
 include(GoogleTest)
