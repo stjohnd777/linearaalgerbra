@@ -2,6 +2,8 @@
 // Created by Daniel St. John on 11/10/23.
 //
 #pragma once
+
+#include "common.h"
 #include "Vector.h"
 #include "ColVector.h"
 
@@ -28,13 +30,9 @@ public:
     RowVector(std::initializer_list<T> list)
     : Vector<T, N>(list) { } // Use parent constructor
 
-    // dot product
-    T dot( const ColVector<T,N> & aCol){
-        return this->dot(aCol); // Use shared dot product logic
-    }
 
     T operator *( const ColVector<T,N> & aCol){
-        return this->dot(aCol); // Use shared dot product logic
+        return  dot(*this,aCol); // Use shared dot product logic
     }
 
     ColVector<T,N> transpose(){

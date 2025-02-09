@@ -188,15 +188,15 @@ public:
         }
     }
 
-    /** Compute the dot product */
-    // Overload for scaling a vector by a scalar: Vector * Scalar
-    friend Vector<T, N> dot(const Vector<T, N>& vec, const T& scalar) {
-        Vector<T, N> result; // Create a new Vector to store the result
+
+    friend T dot(const Vector<T, N>& lhs,const Vector<T, N>& rhs) {
+        T result = T(0); // Initialize to zero
         for (size_t i = 0; i < N; ++i) {
-            result[i] = vec[i] * scalar; // Scale each component
+            result += lhs[i] * rhs[i]; // Multiply element-wise and accumulate
         }
         return result;
     }
+
     friend Vector<T, N> operator*(const Vector<T, N>& vec, const T& scalar) {
         Vector<T, N> result; // Create a new Vector to store the result
         for (size_t i = 0; i < N; ++i) {

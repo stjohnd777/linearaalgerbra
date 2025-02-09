@@ -17,7 +17,7 @@ protected:
 };
 
 TEST_F(RowVectorTest, DotProduct) {
-    double result = row_vector.dot(col_vector);
+    double result = row_vector * col_vector;
     EXPECT_DOUBLE_EQ(32, result);
 }
 

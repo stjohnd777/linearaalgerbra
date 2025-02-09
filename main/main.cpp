@@ -18,7 +18,7 @@ int main() {
 
     Matrix<double, 3, 3> aM1{11, 12, 13, 21, 22, 23, 31, 32, 33};
     cout << aM1 << endl;
-    cout << determinate(aM1) << endl;
+    cout << _determinate(aM1) << endl;
 
     /**
      * Test row iterator
@@ -170,7 +170,7 @@ int main() {
             cout << T << endl;
             auto minor = T.getCofactorMatrix(r, c);
             cout << minor << endl;
-            cout <<  determinate(minor) << endl;
+            cout <<  _determinate(minor) << endl;
         }
     }
 
