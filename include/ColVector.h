@@ -2,8 +2,12 @@
 // Created by Daniel St. John on 11/10/23.
 //
 #pragma once
+#include "Vector.h"
 #include "RowVector.h"
+
+template<typename T, size_t N> class Vector;
 template <typename T , size_t N> class RowVector ;
+
 
 /**
  *

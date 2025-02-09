@@ -4,14 +4,14 @@
 #pragma once
 #include "Vector.h"
 #include "ColVector.h"
-using namespace std;
+
+template<typename T, size_t N> class Vector;
 template <typename T , size_t N> class ColVector ;
 
 /**
  * RowVector<double, 3> row = RowVector<double, 3>::from({1.0, 2.0, 3.0});
  * ColVector<double, 3> col{4.0, 5.0, 6.0};
- *
- *
+
  * @tparam T
  * @tparam N
  */
@@ -45,7 +45,8 @@ public:
         return colVector;
     }
 
-    friend ostream &operator<<(ostream &os, const RowVector<T,N> &colVector) {
+
+    friend std::ostream &operator<<(std::ostream &os, const RowVector<T,N> &colVector) {
         os << "RowVector:" ;
         colVector.format(os);
         return os;

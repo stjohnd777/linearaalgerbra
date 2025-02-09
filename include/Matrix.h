@@ -6,7 +6,9 @@
 #include <cassert>
 #include <iostream>
 #include <array>
+#include <algorithm>
 #include "RowVector.h"
+
 
 template< typename T =double, size_t ROWS =3, size_t COLS=3 >
 class Matrix {
@@ -15,22 +17,40 @@ private:
 public:
     const size_t  m_cols = ROWS;
     const size_t  m_rows =  COLS;
+
     Matrix(){
         zero();
     }
-    Matrix ( std::initializer_list<T> l)   {
+
+
+    explicit Matrix ( std::array<T,ROWS * COLS> l)   {
         assert(l.size() == ROWS * COLS  );
         zero();
         size_t index=0;
         size_t r;
         size_t c;
-        for_each(l.begin(),l.end(),[&](T aValue){
+        std::for_each(l.begin(),l.end(),[&](T aValue){
             r = index / COLS;
             c = index - r*COLS;
             this->setElement(r,c,aValue);
             index++;
         });
     }
+
+    Matrix ( std::initializer_list<T> l)   {
+        assert(l.size() == ROWS * COLS  );
+        zero();
+        size_t index=0;
+        size_t r;
+        size_t c;
+        std::for_each(l.begin(),l.end(),[&](T aValue){
+            r = index / COLS;
+            c = index - r*COLS;
+            this->setElement(r,c,aValue);
+            index++;
+        });
+    }
+
     explicit Matrix( std::array< RowVector<T,COLS>, ROWS> rows){
         zero();
         size_t index = 0;
@@ -38,17 +58,53 @@ public:
             this->setRowVector(index++,r);
         }
     }
-    explicit Matrix ( std::array<T,ROWS*COLS> dataT ){
-        // a11a12..a1na21a22...a2n .... am1am2 .... amn
-        zero();
-        size_t r;
-        size_t c;
-        for ( auto index =0 ; index < ROWS*COLS ; index++){
-            r = index / COLS;
-            c = index - r*COLS;
-            this->setElement(r,c,dataT.at(index));
+
+    Matrix& operator=(const Matrix& other)
+    {
+        if (this != &other)
+        {
+            // Here, you can do the copying of the `m_RowVectors` member
+            // Since `std::array` already has a defined copy assignment operator, we can use it
+            m_RowVectors = other.m_RowVectors;
         }
+        return *this;
     }
+
+    Matrix(const Matrix& other) : m_RowVectors(other.m_RowVectors), m_cols(other.m_cols), m_rows(other.m_rows)
+    {
+        // Since std::array and size_t types take care of their own copying,
+        // and we don't have any pointers or dynamically allocated resources in your class,
+        // we can use the copy constructor of std::array to do the work.
+        // The copy is done in the member initializer list above: m_RowVectors(other.m_RowVectors)
+    }
+
+    Matrix& operator=(Matrix&& other) noexcept
+    {
+        if (this != &other)
+        {
+            // For move assignment, we also need to make sure all resources of `this` are released
+            // If your class was managing any dynamically allocated memory, this is where you would `delete` it.
+            // However, since your class members (`m_RowVectors`) are automatically managed (they will automatically free their memory when they go out of scope),
+            // you do not need to manually release any resources here.
+
+            m_RowVectors = std::move(other.m_RowVectors);
+            // Note that `other.m_RowVectors` is in a valid but unspecified state now
+            // It is okay, because we know `other` is a temporary object that will be destroyed soon
+        }
+        return *this;
+    }
+
+//    explicit Matrix ( std::array<T,ROWS*COLS> dataT ){
+//        // a11a12..a1na21a22...a2n .... am1am2 .... amn
+//        zero();
+//        size_t r;
+//        size_t c;
+//        for ( auto index =0 ; index < ROWS*COLS ; index++){
+//            r = index / COLS;
+//            c = index - r*COLS;
+//            this->setElement(r,c,dataT.at(index));
+//        }
+//    }
 
     const RowVector<T,COLS> & operator[](size_t i) const {
         return m_RowVectors[i];
@@ -187,7 +243,7 @@ public:
      *
      * The Cofactor Matrix C = [ Cij]
      */
-    Matrix<T,ROWS-1,ROWS-1> getMinor(const size_t r, const size_t  c){
+    Matrix<T,ROWS-1,ROWS-1> getCofactorMatrix(const size_t r, const size_t  c){
         static_assert(ROWS > 0 && COLS > 0, "Matrix dimensions must be positive.");
         std::array<T,(ROWS-1)*(ROWS-1)> aij;
         size_t index = 0;
@@ -211,7 +267,8 @@ public:
         Matrix<T,ROWS,COLS> cof;
         for ( auto r =0 ; r < ROWS; r++){
             for ( auto c =0 ; c < ROWS; c++){
-                cof.setElement(c,r, determinate(getMinor(r,c)));
+                //cof.setElement(c,r, determinate(getCofactorMatrix(r, c)));
+                cof.setElement(c,r, getCofactorMatrix(r, c).determinate());
             }
         }
         return cof;
@@ -220,7 +277,7 @@ public:
 
     Matrix<T,ROWS,ROWS> inv (){
         static_assert(ROWS==COLS);
-        return ( 1/ determinate(*this) ) * getAdjunct();
+        return ( 1/ determinate() ) * getAdjunct();
     }
 
     Matrix<T,COLS,ROWS> transpose(){
@@ -232,9 +289,42 @@ public:
         return m;
     }
 
-    friend ostream &operator<<(ostream &os, const Matrix &matrix) {
+    T determinate (  ){
+        T det = 0;
+        if (ROWS == 2) {
+            det = getElement(0, 0) * getElement(1, 1) -getElement(0, 1) * getElement(1, 0);
+        } else if (ROWS == 3) {
+            /*
+               a b c
+               d e f
+               g h i
+             */
+            auto a = getElement(0, 0);
+            auto b = getElement(0, 1);
+            auto c = getElement(0, 2);
+
+            auto d = getElement(1, 0);
+            auto e = getElement(1, 1);
+            auto f = getElement(1, 2);
+
+            auto g = getElement(2, 0);
+            auto h = getElement(2, 1);
+            auto i = getElement(0, 0);
+            det = a * e * i + b * f * g + c * d * h - c * e * g - b * d * i - b * d * i;
+        } else {
+
+//         for ( auto col =0; col < N; col++){
+//             Matrix<T,N-1,N-1> c = m.getCofactorMatrix(0,col);
+//             T detc = determinate(c);
+//         }
+        }
+        return det;
+
+    }
+
+    friend std::ostream &operator<<(std::ostream &os, const Matrix &matrix) {
        for (auto r : matrix){
-           os << r << endl;
+           os << r << std::endl;
        }
         return os;
     }

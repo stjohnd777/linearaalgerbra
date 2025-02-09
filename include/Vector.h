@@ -3,21 +3,49 @@
 #include <algorithm>
 #include <cmath>
 #include <ostream>
+#include <tuple>
+#include <memory>
 #include <numeric>
 #include <stdexcept>
 #include <initializer_list>
+#include <stdexcept>
+#include <cstring>
+#include <string>
+
+#include "RowVector.h"
+#include "ColVector.h"
+
+template <typename T , size_t N> class RowVector ;
+template <typename T , size_t N> class ColVector ;
+
+class VectorNormalizationException : public std::runtime_error {
+public:
+    VectorNormalizationException()
+            : std::runtime_error("Cannot normalize a Zero-Length Vector") {}
+};
+
+class DivideByZeroException : public std::runtime_error {
+public:
+    DivideByZeroException()
+            : std::runtime_error("Division by Zero is not allowed") {}
+};
+
+class InvalidDimensionException : public std::runtime_error {
+public:
+    InvalidDimensionException()
+            : std::runtime_error("Invalid dimension for the current operation") {}
+};
 
 /**
- * In linear algebra, you have the abstract concept of
- * a vector independent of whether it’s a row or column
+ * vector independent from viewed as row or column
  * vector. This class models such vectors.
  *
- * This version uses composition, encapsulating `std::array`
+ * This version uses composition, encapsulating on `std::array`
  * as a private member so we retain full control over the
  * interface.
  *
  * Example usage:
- *
+
     #include <iostream>
     #include "Vector.h"
 
@@ -40,7 +68,6 @@
         return 0;
     }
  * ```
- *
  * @tparam T The type of the vector's elements (e.g., double, int).
  * @tparam N The number of dimensions.
  */
@@ -66,6 +93,22 @@ public:
     /** Static initializer for constructing from an initializer list */
     static Vector<T, N> from(std::initializer_list<T> list) {
         return Vector(list);
+    }
+
+    RowVector<T, N> as_row_vector() const {
+        RowVector<T, N> rowVector;
+        for (size_t i = 0; i < N; ++i) {
+            rowVector[i] = this->operator[](i);
+        }
+        return rowVector;
+    }
+
+    ColVector<T, N> as_col_vector() const {
+        ColVector<T, N> colVector;
+        for (size_t i = 0; i < N; ++i) {
+            colVector[i] = this->operator[](i);
+        }
+        return colVector;
     }
 
     /** Static initializer for constructing a zero vector */
@@ -185,7 +228,7 @@ public:
     void normalize() {
         T length = norm();
         if (length == 0) {
-            throw std::runtime_error("Cannot normalize a zero-length vector");
+            throw VectorNormalizationException();
         }
         for (auto& val : data) {
             val /= length;
@@ -196,7 +239,7 @@ public:
     Vector<T, N> normalized() const {
         T length = norm();
         if (length == 0) {
-            throw std::runtime_error("Cannot normalize a zero-length vector");
+            throw DivideByZeroException();
         }
         Vector<T, N> result;
         for (size_t i = 0; i < N; ++i) {
@@ -207,7 +250,9 @@ public:
 
     /** Compute the cross product (only for 3D vectors) */
     Vector<T, 3> cross(const Vector<T, 3>& other) const {
-        static_assert(N == 3, "Cross product is only defined for 3D vectors.");
+        if (N != 3){
+            throw InvalidDimensionException();
+        }
         Vector<T, 3> result;
         result[0] = data[1] * other[2] - data[2] * other[1];
         result[1] = data[2] * other[0] - data[0] * other[2];

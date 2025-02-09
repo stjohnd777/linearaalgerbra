@@ -5,6 +5,7 @@
 
 using namespace std;
 
+#include "Vector.h"
 #include "ColVector.h"
 #include "RowVector.h"
 #include "Matrix.h"
@@ -161,13 +162,13 @@ int main() {
     Matrix T = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     cout << T << endl;
 
-    cout << T.getMinor(0, 0) << endl;
+    cout << T.getCofactorMatrix(0, 0) << endl;
     for (auto r = 0; r < T.m_rows; r++) {
         for (auto c = 0; c < T.m_cols; c++) {
 
             cout << "C(" << r +1 << "," << c + 1 << ")" << endl;
             cout << T << endl;
-            auto minor = T.getMinor(r, c);
+            auto minor = T.getCofactorMatrix(r, c);
             cout << minor << endl;
             cout <<  determinate(minor) << endl;
         }
