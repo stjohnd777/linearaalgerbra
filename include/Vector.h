@@ -156,7 +156,6 @@ public:
         }
         return result;
     }
-
     /** In-place addition */
     void operator+=(const Vector<T, N>& other) {
         for (size_t i = 0; i < N; ++i) {
@@ -170,7 +169,6 @@ public:
             data[i] -= other[i];
         }
     }
-
     /** Scale the vector by a scalar (element-wise) */
     void operator*=(const T& scalar) {
         for (auto& val : data) {
@@ -196,7 +194,6 @@ public:
         }
         return result;
     }
-
     friend Vector<T, N> operator*(const Vector<T, N>& vec, const T& scalar) {
         Vector<T, N> result; // Create a new Vector to store the result
         for (size_t i = 0; i < N; ++i) {
