@@ -2,16 +2,21 @@
 #include "Matrix.h"
 #include "Quaternion.h"
 
-template<typename T>
-class DCM : public Matrix<T,3,3> {
-public:
-    DCM (){
+namespace dsj {
 
-    }
-    DCM(Quaternion<T>& q) {
+    template<typename T>
+    class DCM : public Matrix<T, 3, 3> {
+    public:
+        DCM() {
 
-    }
-    DCM (double roll, double pitch, double yaw){
+        }
 
-    }
-};
+        DCM(Quaternion<T> &q) {
+
+        }
+
+        DCM(double roll, double pitch, double yaw) {
+
+        }
+    };
+}

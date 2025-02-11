@@ -2,6 +2,7 @@
 #include "RowVector.h"
 #include "ColVector.h"
 
+using namespace dsj;
 class RowVectorTest : public ::testing::Test {
 
 protected:

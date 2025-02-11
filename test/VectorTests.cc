@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "Vector.h"
+using namespace dsj;
 
 // Test fixture for Vector tests
 class VectorTest : public ::testing::Test {

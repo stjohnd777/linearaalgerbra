@@ -1,9 +1,8 @@
 #pragma once
+
 #include "Matrix.h"
 
-
-
-
+namespace dsj {
     template<typename T, size_t N = 3>
     T _determinate(Matrix<T, N, N> &m) {
         T det = 0;
@@ -37,3 +36,4 @@
         return det;
     }
 
+}

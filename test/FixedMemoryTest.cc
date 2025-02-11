@@ -2,6 +2,7 @@
 #include "FixMemory.h"
 #include "Vector.h"
 
+using namespace dsj;
 class FixedMemoryTest : public ::testing::Test {
 
 protected:
