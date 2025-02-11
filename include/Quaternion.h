@@ -24,7 +24,6 @@ namespace dsj {
     class Quaternion {
     public:
         T w, x, y, z; // Quaternion components
-
         // Default Constructor
         explicit Quaternion(T w = 1, T x = 0, T y = 0, T z = 0)
                 : w(w), x(x), y(y), z(z) {}
@@ -63,8 +62,6 @@ namespace dsj {
 
             return R;
         }
-
-
     };
 
 // Function to convert a DCM (3x3 matrix) to a Quaternion
