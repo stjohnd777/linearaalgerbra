@@ -7,6 +7,7 @@
 #include <iostream>
 #include <array>
 #include <algorithm>
+#include <random>
 #include "RowVector.h"
 
 namespace dsj {
@@ -356,6 +357,63 @@ namespace dsj {
                 os << r << std::endl;
             }
             return os;
+        }
+
+        void randomize(T min = 0, T max = 1) {
+            static_assert(std::is_floating_point<T>::value || std::is_integral<T>::value,
+                          "Matrix type must be numeric");
+
+            std::random_device dev;
+            std::mt19937 rng(dev());
+
+            if constexpr (std::is_integral<T>::value) {
+                std::uniform_int_distribution<T> dist(min, max);
+
+                for (size_t rowIndex = 0; rowIndex < ROWS; rowIndex++) {
+                    for (size_t colIndex = 0; colIndex < COLS; colIndex++) {
+                        T randomValue = dist(rng);
+                        this->setElement(rowIndex, colIndex, randomValue);
+                    }
+                }
+
+            } else {
+                std::uniform_real_distribution<T> dist(min, max);
+
+                for (size_t rowIndex = 0; rowIndex < ROWS; rowIndex++) {
+                    for (size_t colIndex = 0; colIndex < COLS; colIndex++) {
+                        T randomValue = dist(rng);
+                        this->setElement(rowIndex, colIndex, randomValue);
+                    }
+                }
+            }
+        }
+
+        void randomizeNonSingular(T min = 0, T max = 1) {
+
+            Matrix<T, ROWS, COLS> ensure_non_zero_determinant(T min = 0, T max = 1) {
+                Matrix<T, ROWS, COLS> matrix;
+                do {
+                    matrix.randomize(min, max);
+                } while (matrix.determinate() == 0);
+                return matrix;
+            }
+        }
+
+        T norm() const {
+            T sum = 0;
+            for (size_t i = 0; i < ROWS; i++) {
+                for (size_t j = 0; j < COLS; j++) {
+                    sum += std::pow(m_RowVectors[i][j], 2);
+                }
+            }
+            return std::sqrt(sum);
+        }
+
+        T conditionNumber() const {
+            Matrix<T, ROWS, COLS> inv = this->inverse();
+            T normA = this->norm();
+            T normInvA = inv.norm();
+            return normA * normInvA;
         }
 
     private:
