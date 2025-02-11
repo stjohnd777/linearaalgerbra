@@ -54,6 +54,9 @@ namespace dsj {
             return os;
         }
 
+        bool operator==(const RowVector<T,N>& rhs){
+            return std::equal( this->begin(),   this->end(), rhs.begin());
+        }
     };
 
 }

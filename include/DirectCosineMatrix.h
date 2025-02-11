@@ -18,5 +18,10 @@ namespace dsj {
         DCM(double roll, double pitch, double yaw) {
 
         }
+
+        bool IsValibe(){
+            
+            return this->determinate() == 1
+        }
     };
 }

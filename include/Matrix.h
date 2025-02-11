@@ -99,18 +99,7 @@ namespace dsj {
             }
             return *this;
         }
-
-//    explicit Matrix ( std::array<T,ROWS*COLS> dataT ){
-//        // a11a12..a1na21a22...a2n .... am1am2 .... amn
-//        zero();
-//        size_t r;
-//        size_t c;
-//        for ( auto index =0 ; index < ROWS*COLS ; index++){
-//            r = index / COLS;
-//            c = index - r*COLS;
-//            this->setElement(r,c,dataT.at(index));
-//        }
-//    }
+ 
 
         const RowVector<T, COLS> &operator[](size_t i) const {
             return m_RowVectors[i];
@@ -124,7 +113,7 @@ namespace dsj {
 
         auto end() const { return m_RowVectors.end(); }
 
-        bool isSquare() const { return m_cols == m_cols; }
+        bool isSquare() const { return m_cols == m_rows; }
 
         T getElement(const size_t row, const size_t col) const {
             return (m_RowVectors)[row][col];
@@ -192,12 +181,6 @@ namespace dsj {
                     sum.setElement(r, c, this->getElement(r, c) + lhs.getElement(r, c));
                 }
             }
-            // std::transform(
-            //     m_RowVectors.begin(),
-            //     m_RowVectors.end(),
-            //     m_RowVectors.begin(),
-            //     m_RowVectors.begin(),
-            //         [](const auto &a, const auto &b) { return a + b; });
             return sum;
         }
 
@@ -248,12 +231,16 @@ namespace dsj {
             return x;
         }
 
+        bool operator==(const Matrix<T,ROWS,COLS>& rhs){
+            return std::equal( this->begin(),   this->end(), rhs.begin());
+        }
+
         /*
          * If A is a square matrix, then the minor Mij column is
-         * a number formed taking the determinate of  matrix by deleting
-         * the i row and j column of A and is denoted Mij
+         * the determinate of matrix by deleting the i row and j column of
+         * A and is denoted Mij
          *
-         * The cofactor Cij  is obtained by multiplying the
+         * The cofactor Cij is obtained by multiplying the
          * minor Cij =(-1)^(i+j) * Mij
          *
          * The Cofactor Matrix C = [ Cij]
@@ -282,7 +269,6 @@ namespace dsj {
             Matrix<T, ROWS, COLS> cof;
             for (auto r = 0; r < ROWS; r++) {
                 for (auto c = 0; c < ROWS; c++) {
-                    //cof.setElement(c,r, determinate(getCofactorMatrix(r, c)));
                     cof.setElement(c, r, getCofactorMatrix(r, c).determinate());
                 }
             }
@@ -388,15 +374,12 @@ namespace dsj {
             }
         }
 
-        void randomizeNonSingular(T min = 0, T max = 1) {
-
-            Matrix<T, ROWS, COLS> ensure_non_zero_determinant(T min = 0, T max = 1) {
-                Matrix<T, ROWS, COLS> matrix;
-                do {
-                    matrix.randomize(min, max);
-                } while (matrix.determinate() == 0);
-                return matrix;
-            }
+        Matrix<T, ROWS, COLS> randomizeNonSingular(T min = 0, T max = 1) {
+            Matrix<T, ROWS, COLS> matrix;
+            do {
+                matrix.randomize(min, max);
+            } while (matrix.determinate() == 0);
+            return matrix;
         }
 
         T norm() const {
